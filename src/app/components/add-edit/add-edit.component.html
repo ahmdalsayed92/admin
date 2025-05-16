@@ -1,5 +1,21 @@
 <div class="p-20">
   <h1 class="text-[32px] text-center mb-8">Add a New Website</h1>
+  <button
+    class="aegov-btn btn-link absolute top-0 right-0 mt-4 mr-4"
+    [routerLink]="['/']"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      fill="#000000"
+      viewBox="0 0 256 256"
+    >
+      <path
+        d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"
+      ></path>
+    </svg>
+  </button>
 
   <nav aria-label="Progress" class="aegov-step pb-9 m-auto w-1/2">
     <ol role="list" class="flex items-center justify-between">
@@ -35,12 +51,18 @@
 
   <!-- form  -->
   <form [formGroup]="form" (ngSubmit)="editMode ? update() : onSubmit()">
-    <div class="website-details" *ngIf="firtsStep">
+    <div class="website-details" *ngIf="firstStep">
       <h2 class="text-2xl">Website</h2>
       <div
-        class="md:col-span-2 grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-3 items-end mt-6"
+        class="md:col-span-2 grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-3 items-start mt-6"
       >
-        <div class="aegov-form-control">
+        <div
+          class="aegov-form-control"
+          [class.control-error]="
+            form.controls['websiteName'].invalid &&
+            form.controls['websiteName'].pristine == false
+          "
+        >
           <label for="opt1">Website Name</label>
           <div class="form-control-input">
             <input
@@ -50,8 +72,20 @@
               type="text"
             />
           </div>
+          <p
+            class="error-message"
+            *ngIf="form.invalid && form.controls['websiteName'].errors?.['required'] && form.controls['websiteName'].pristine == false"
+          >
+            <strong>Error:</strong> This field is required.
+          </p>
         </div>
-        <div class="aegov-form-control">
+        <div
+          class="aegov-form-control"
+          [class.control-error]="
+            form.controls['baseUrl'].invalid &&
+            form.controls['baseUrl'].pristine == false
+          "
+        >
           <label for="baseUrl">Base URL</label>
           <div class="form-control-input">
             <input
@@ -62,56 +96,139 @@
               placeholder="Search for something"
             />
           </div>
+          <p
+            class="error-message"
+            *ngIf="form.invalid && form.controls['baseUrl'].errors?.['required'] && form.controls['baseUrl'].pristine == false"
+          >
+            <strong>Error:</strong> This field is required.
+          </p>
+          <p
+            class="error-message"
+            *ngIf="form.invalid && form.controls['baseUrl'].errors?.['invalidUrl'] && form.controls['baseUrl'].pristine == false"
+          >
+            <strong>Error:</strong> This URL is invalid.
+          </p>
         </div>
       </div>
       <h2 class="text-2xl mt-20">Digital Accessibility Officer</h2>
-      <div
-        class="md:col-span-2 grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-3 items-end mt-6"
-      >
-        <div class="aegov-form-control">
-          <label for="name">Full Name</label>
-          <div class="form-control-input">
-            <input
-              type="text"
-              name="name"
-              id="name"
-              formControlName="name"
-              placeholder="enter name"
-            />
-          </div>
-        </div>
-        <div class="aegov-form-control">
-          <label for="email">Email Address</label>
-          <div class="form-control-input">
-            <input
-              type="text"
-              name="email"
-              id="email"
-              formControlName="email"
-              placeholder="enter email address"
-            />
+      <!-- admins -->
+      <div class="">
+        <div formArrayName="admins">
+          <div
+            *ngFor="let admin of admins.controls; let i = index"
+            [formGroupName]="i"
+            class="md:col-span-2 grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-3 items-start mt-6"
+          >
+            <div
+              class="aegov-form-control"
+              [class.control-error]="
+                admin.get('adminName')?.invalid &&
+                admin.get('adminName')?.pristine == false
+              "
+            >
+              <label for="adminName">Full Name</label>
+              <div class="form-control-input">
+                <input
+                  type="text"
+                  name="adminName"
+                  id="adminName"
+                  formControlName="adminName"
+                  placeholder="enter admin name"
+                />
+              </div>
+              <p
+                class="error-message"
+                *ngIf="form.invalid && admin.get('adminName')?.errors?.['required'] && admin.get('adminName')?.pristine == false"
+              >
+                <strong>Error:</strong> This field is required.
+              </p>
+            </div>
+            <div
+              class="aegov-form-control"
+              [class.control-error]="
+                admin.get('adminEmail')?.invalid &&
+                admin.get('adminEmail')?.pristine == false
+              "
+            >
+              <label for="adminEmail">Email Address</label>
+              <div class="form-control-input">
+                <input
+                  type="text"
+                  name="adminEmail"
+                  id="adminEmail"
+                  formControlName="adminEmail"
+                  placeholder="enter admin email address"
+                />
+              </div>
+              <p
+                class="error-message"
+                *ngIf="form.invalid && admin.get('adminEmail')?.errors?.['required'] && admin.get('adminEmail')?.pristine == false"
+              >
+                <strong>Error:</strong> This field is required.
+              </p>
+              <p
+                class="error-message"
+                *ngIf="form.invalid && admin.get('adminEmail')?.errors?.['email'] && admin.get('adminEmail')?.pristine == false"
+              >
+                <strong>Error:</strong> This email format is invalid.
+              </p>
+            </div>
+            <div class="flex justify-start items-center self-end">
+              <button
+                class="aegov-btn btn-icon btn-sm btn-soft"
+                type="button"
+                (click)="removeAdmin(i)"
+                aria-label="Remove page"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="32"
+                  height="32"
+                  fill="#000000"
+                  viewBox="0 0 256 256"
+                >
+                  <path
+                    d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"
+                  ></path>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
+      <button
+        type="button"
+        class="aegov-btn btn-outline btn-secondary mt-10"
+        (click)="addAdmin()"
+      >
+        Add New Admin
+      </button>
       <div class="flex justify-end mt-10">
         <button
           type="button"
           class="aegov-btn btn-soft"
-          (click)="firtsStep = false; secondStep = true; continueStep('first')"
+          [disabled]="!nextStep"
+          (click)="firstStep = false; secondStep = true; continueStep('first')"
         >
           Continue
         </button>
       </div>
     </div>
-    <div class="pages" *ngIf="firtsStep == false && secondStep == true">
+    <!-- pages -->
+    <div class="pages" *ngIf="firstStep == false && secondStep == true">
       <h2 class="text-2xl mt-20">Pages needed to score the website</h2>
       <div formArrayName="pages">
         <div
           *ngFor="let page of pages.controls; let i = index"
           [formGroupName]="i"
-          class="md:col-span-2 grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-3 items-end mt-6"
+          class="md:col-span-2 grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-3 items-start mt-6"
         >
-          <div class="aegov-form-control">
+          <div
+            class="aegov-form-control"
+            [class.control-error]="
+              page.get('title')?.invalid && page.get('title')?.pristine == false
+            "
+          >
             <label for="title">Page {{ i }} title</label>
             <div class="form-control-input">
               <input
@@ -122,8 +239,19 @@
                 placeholder="enter page title"
               />
             </div>
+            <p
+              class="error-message"
+              *ngIf="form.invalid && page.get('title')?.errors?.['required'] && page.get('title')?.pristine == false"
+            >
+              <strong>Error:</strong> This field is required.
+            </p>
           </div>
-          <div class="aegov-form-control">
+          <div
+            class="aegov-form-control"
+            [class.control-error]="
+              page.get('url')?.invalid && page.get('url')?.pristine == false
+            "
+          >
             <label for="url">URL</label>
             <div class="form-control-input">
               <input
@@ -134,53 +262,41 @@
                 placeholder="enter page url"
               />
             </div>
+            <p
+              class="error-message"
+              *ngIf="form.invalid && page.get('url')?.errors?.['required'] && page.get('url')?.pristine == false"
+            >
+              <strong>Error:</strong> This field is required.
+            </p>
+            <p
+              class="error-message"
+              *ngIf="form.invalid && page.get('url')?.errors?.['invalidUrl'] && page.get('url')?.pristine == false"
+            >
+              <strong>Error:</strong> This URL is invalid.
+            </p>
           </div>
-          <div class="flex justify-start items-center">
+          <div class="flex justify-start items-center self-end">
             <button
               class="aegov-btn btn-icon btn-sm btn-soft"
               type="button"
               (click)="removePage(i)"
+              aria-label="Remove page"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                <rect width="256" height="256" fill="none" aria-hidden="true" />
-                <circle
-                  cx="84"
-                  cy="108"
-                  r="52"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="16"
-                />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                fill="#000000"
+                viewBox="0 0 256 256"
+              >
                 <path
-                  d="M10.23,200a88,88,0,0,1,147.54,0"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="16"
-                />
-                <path
-                  d="M172,160a87.93,87.93,0,0,1,73.77,40"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="16"
-                />
-                <path
-                  d="M152.69,59.7A52,52,0,1,1,172,160"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="16"
-                />
+                  d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"
+                ></path>
               </svg>
             </button>
           </div>
         </div>
+
         <button
           type="button"
           class="aegov-btn btn-outline btn-secondary mt-10"
@@ -188,12 +304,41 @@
         >
           New page
         </button>
+        <div role="alert" class="aegov-alert alert-info mt-10">
+          <div class="alert-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+              <rect width="256" height="256" fill="none" aria-hidden="true" />
+              <circle
+                cx="128"
+                cy="128"
+                r="96"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+              <path
+                d="M120,120a8,8,0,0,1,8,8v40a8,8,0,0,0,8,8"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+              <circle cx="124" cy="84" r="12" />
+            </svg>
+          </div>
+          <div class="alert-content">
+            <p>At least 3 pages are required to continue</p>
+          </div>
+        </div>
       </div>
       <div class="flex justify-between mt-10">
         <button
           type="button"
           class="aegov-btn btn-soft"
-          (click)="firtsStep = true; secondStep = false; backStep()"
+          (click)="firstStep = true; secondStep = false; backStep()"
         >
           Back
         </button>
@@ -202,7 +347,7 @@
           class="aegov-btn btn-soft"
           [disabled]="disableSubmit"
           (click)="
-            firtsStep = false;
+            firstStep = false;
             secondStep = false;
             thirdStep = true;
             continueStep('last')
@@ -215,7 +360,7 @@
 
     <div
       class="widget-code"
-      *ngIf="firtsStep == false && secondStep == false && thirdStep == true"
+      *ngIf="firstStep == false && secondStep == false && thirdStep == true"
     >
       <h2 class="text-2xl mt-20">Widget Code</h2>
       <div class="flex justify-between mt-5">
@@ -224,12 +369,13 @@
           {{ widgetCode }}
 
           <svg
-            class="ml-2"
+            class="ml-2 cursor-pointer"
             width="22"
             height="22"
             viewBox="0 0 22 22"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            (click)="copyCode()"
           >
             <path
               d="M17.125 4H1.375C1.14294 4 0.920376 4.09219 0.756282 4.25628C0.592187 4.42038 0.5 4.64294 0.5 4.875V20.625C0.5 20.8571 0.592187 21.0796 0.756282 21.2437C0.920376 21.4078 1.14294 21.5 1.375 21.5H17.125C17.3571 21.5 17.5796 21.4078 17.7437 21.2437C17.9078 21.0796 18 20.8571 18 20.625V4.875C18 4.64294 17.9078 4.42038 17.7437 4.25628C17.5796 4.09219 17.3571 4 17.125 4ZM16.25 19.75H2.25V5.75H16.25V19.75ZM21.5 1.375V17.125C21.5 17.3571 21.4078 17.5796 21.2437 17.7437C21.0796 17.9078 20.8571 18 20.625 18C20.3929 18 20.1704 17.9078 20.0063 17.7437C19.8422 17.5796 19.75 17.3571 19.75 17.125V2.25H4.875C4.64294 2.25 4.42038 2.15781 4.25628 1.99372C4.09219 1.82962 4 1.60706 4 1.375C4 1.14294 4.09219 0.920376 4.25628 0.756282C4.42038 0.592187 4.64294 0.5 4.875 0.5H20.625C20.8571 0.5 21.0796 0.592187 21.2437 0.756282C21.4078 0.920376 21.5 1.14294 21.5 1.375Z"
@@ -238,53 +384,61 @@
           </svg>
         </div>
       </div>
+      <div role="alert" class="aegov-alert alert-warning mt-8">
+        <div class="alert-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+            <rect width="256" height="256" fill="none" aria-hidden="true" />
+            <path
+              d="M142.41,40.22l87.46,151.87C236,202.79,228.08,216,215.46,216H40.54C27.92,216,20,202.79,26.13,192.09L113.59,40.22C119.89,29.26,136.11,29.26,142.41,40.22Z"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="16"
+            />
+            <line
+              x1="128"
+              y1="144"
+              x2="128"
+              y2="104"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="16"
+            />
+            <circle cx="128" cy="180" r="12" />
+          </svg>
+        </div>
+        <div class="alert-content">
+          <p>
+            You have to add a variable named <span>adminEmail</span> in your
+            browser localstorage to store the user admin email
+          </p>
+        </div>
+      </div>
     </div>
+
     <div
       class="flex gap-3 mt-10"
-      *ngIf="firtsStep == false && secondStep == false && thirdStep == true"
+      *ngIf="firstStep == false && secondStep == false && thirdStep == true"
     >
       <div class="flex-1">
         <button
           class="aegov-btn btn-soft justify-self-end flex-1"
           type="button"
-          (click)="firtsStep = false; secondStep = true; thirdStep = false"
+          (click)="firstStep = false; secondStep = true; thirdStep = false"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-            <rect width="256" height="256" fill="none" aria-hidden="true" />
-            <circle
-              cx="84"
-              cy="108"
-              r="52"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            fill="#000000"
+            viewBox="0 0 256 256"
+          >
             <path
-              d="M10.23,200a88,88,0,0,1,147.54,0"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            />
-            <path
-              d="M172,160a87.93,87.93,0,0,1,73.77,40"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            />
-            <path
-              d="M152.69,59.7A52,52,0,1,1,172,160"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            />
+              d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"
+            ></path>
           </svg>
           Back
         </button>
@@ -295,85 +449,36 @@
         type="button"
         (click)="done()"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-          <rect width="256" height="256" fill="none" aria-hidden="true" />
-          <circle
-            cx="84"
-            cy="108"
-            r="52"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          fill="#000000"
+          viewBox="0 0 256 256"
+        >
           <path
-            d="M10.23,200a88,88,0,0,1,147.54,0"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          />
-          <path
-            d="M172,160a87.93,87.93,0,0,1,73.77,40"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          />
-          <path
-            d="M152.69,59.7A52,52,0,1,1,172,160"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          />
+            d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"
+          ></path>
         </svg>
         Done
       </button>
-      <button class="aegov-btn justify-self-end" type="button">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-          <rect width="256" height="256" fill="none" aria-hidden="true" />
-          <circle
-            cx="84"
-            cy="108"
-            r="52"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          />
+      <a
+        class="aegov-btn justify-self-end"
+        href="mailto:?subject=Widget Code&body={{ widgetCode }}"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          fill="#000000"
+          viewBox="0 0 256 256"
+        >
           <path
-            d="M10.23,200a88,88,0,0,1,147.54,0"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          />
-          <path
-            d="M172,160a87.93,87.93,0,0,1,73.77,40"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          />
-          <path
-            d="M152.69,59.7A52,52,0,1,1,172,160"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          />
+            d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-96,85.15L52.57,64H203.43ZM98.71,128,40,181.81V74.19Zm11.84,10.85,12,11.05a8,8,0,0,0,10.82,0l12-11.05,58,53.15H52.57ZM157.29,128,216,74.18V181.82Z"
+          ></path>
         </svg>
         Email to the officer
-      </button>
+      </a>
     </div>
   </form>
 </div>

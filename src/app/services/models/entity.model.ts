@@ -7,8 +7,14 @@ export interface Entity {
   _id: string;
   title: string;
   domain: string;
-  adminName: string;
-  adminEmail: string;
+  // adminName: string;
+  // adminEmail: string;
+  admins: [
+    {
+      adminName: string;
+      adminEmail: string;
+    }
+  ];
   pages: Page[];
   apiKey?: string;
   isActive?: boolean;

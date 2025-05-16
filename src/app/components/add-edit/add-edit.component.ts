@@ -7,16 +7,20 @@ import {
   ReactiveFormsModule,
   FormArray,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Entity } from '../../services/models/entity.model';
 import { AdminService } from '../../services/admin.service';
 import { env } from '../../environments/dev.env';
 import { AlertService } from '../../services/alert.service';
+import {
+  validUrlValidator,
+  minItemsValidator,
+} from '../../validators/validators';
 
 @Component({
   selector: 'app-add-edit',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterModule],
   templateUrl: './add-edit.component.html',
   styleUrl: './add-edit.component.scss',
 })
@@ -24,8 +28,9 @@ export class AddEditComponent implements OnInit {
   form: FormGroup;
   entityData: Entity | null = null;
   pagesList = [{ title: '', url: '' }];
+  adminsList = [{ adminName: '', adminEmail: '' }];
 
-  firtsStep = true;
+  firstStep = true;
   secondStep = false;
   thirdStep = false;
   widgetCode1 = env.widgetCode1;
@@ -64,10 +69,9 @@ export class AddEditComponent implements OnInit {
     this.form = this.fb.group({
       govEntity: [''],
       websiteName: ['', [Validators.required]],
-      baseUrl: ['', [Validators.required]],
-      name: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      pages: this.fb.array([]),
+      baseUrl: ['', [Validators.required, validUrlValidator]],
+      pages: this.fb.array([], [minItemsValidator(3)]),
+      admins: this.fb.array([]),
     });
 
     this.initForm();
@@ -78,8 +82,7 @@ export class AddEditComponent implements OnInit {
       if (
         this.form.controls['websiteName'].valid &&
         this.form.controls['baseUrl'].valid &&
-        this.form.controls['name'].valid &&
-        this.form.controls['email'].valid
+        this.form.controls['admins'].valid
       ) {
         this.nextStep = true;
         console.log(this.nextStep);
@@ -88,7 +91,7 @@ export class AddEditComponent implements OnInit {
         console.log(this.nextStep);
       }
 
-      if (this.form.controls['pages'].valid) {
+      if (this.form.controls['pages'].valid && this.nextStep === true) {
         this.disableSubmit = false;
       } else {
         this.disableSubmit = true;
@@ -100,6 +103,9 @@ export class AddEditComponent implements OnInit {
   get pages() {
     return this.form.get('pages') as FormArray;
   }
+  get admins() {
+    return this.form.get('admins') as FormArray;
+  }
 
   // Function to load the initial form with pages
   initForm() {
@@ -107,7 +113,19 @@ export class AddEditComponent implements OnInit {
       this.pages.push(
         this.fb.group({
           title: [item.title, Validators.required],
-          url: [item.url, [Validators.required]],
+          url: [item.url, [Validators.required, validUrlValidator]],
+        })
+      );
+    });
+
+    this.adminsList.forEach((item) => {
+      this.admins.push(
+        this.fb.group({
+          adminName: [item.adminName, Validators.required],
+          adminEmail: [
+            item.adminEmail,
+            [Validators.required, Validators.email],
+          ],
         })
       );
     });
@@ -117,7 +135,7 @@ export class AddEditComponent implements OnInit {
     this.pages.push(
       this.fb.group({
         title: ['', Validators.required],
-        url: ['', [Validators.required]],
+        url: ['', [Validators.required, validUrlValidator]],
       })
     );
   }
@@ -125,6 +143,19 @@ export class AddEditComponent implements OnInit {
   // Function to remove a page
   removePage(index: number) {
     this.pages.removeAt(index);
+  }
+
+  addAdmin() {
+    this.admins.push(
+      this.fb.group({
+        adminName: ['', Validators.required],
+        adminEmail: ['', [Validators.required, Validators.email]],
+      })
+    );
+  }
+
+  removeAdmin(index: number) {
+    this.admins.removeAt(index);
   }
 
   loadEditData() {
@@ -142,8 +173,6 @@ export class AddEditComponent implements OnInit {
         govEntity: '', // Add proper mapping here if needed
         websiteName: this.entityData.title,
         baseUrl: this.entityData.domain,
-        name: this.entityData.adminName,
-        email: this.entityData.adminEmail,
       });
 
       // Clear existing pages and add those from entityData
@@ -152,7 +181,19 @@ export class AddEditComponent implements OnInit {
         this.pages.push(
           this.fb.group({
             title: [page.title, Validators.required],
-            url: [page.url, [Validators.required]],
+            url: [page.url, [Validators.required, validUrlValidator]],
+          })
+        );
+      });
+      this.admins.clear();
+      this.entityData.admins.forEach((admin) => {
+        this.admins.push(
+          this.fb.group({
+            adminName: [admin.adminName, Validators.required],
+            adminEmail: [
+              admin.adminEmail,
+              [Validators.required, Validators.email],
+            ],
           })
         );
       });
@@ -166,8 +207,7 @@ export class AddEditComponent implements OnInit {
         _id: '',
         title: this.form.value.websiteName,
         domain: this.form.value.baseUrl,
-        adminName: this.form.value.name,
-        adminEmail: this.form.value.email,
+        admins: this.form.value.admins,
         pages: this.form.value.pages,
       };
 
@@ -182,11 +222,8 @@ export class AddEditComponent implements OnInit {
         },
 
         error: (err) => {
-          console.error('Error updating entity:', err);
-          this.alertService.showAlert(
-            'danger',
-            `error has occured,  Try again.`
-          );
+          console.error('Error updating entity:', err.error);
+          this.alertService.showAlert('danger', err.error.error);
         },
       });
     } else {
@@ -201,8 +238,7 @@ export class AddEditComponent implements OnInit {
         _id: this.entityData ? this.entityData._id : '',
         title: this.form.value.websiteName,
         domain: this.form.value.baseUrl,
-        adminName: this.form.value.name,
-        adminEmail: this.form.value.email,
+        admins: this.form.value.admins,
         pages: this.form.value.pages,
       };
       this.adminService.updateEntity(requestBody._id, requestBody).subscribe({
@@ -243,6 +279,22 @@ export class AddEditComponent implements OnInit {
     this.steps[0].completed = false;
     this.steps[0].currentStep = true;
     this.steps[1].currentStep = false;
+  }
+
+  copyCode() {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(this.widgetCode).then(
+        () => {
+          this.alertService.showAlert(
+            'success',
+            `Text copied to clipboard successfully`
+          );
+        },
+        (err) => {
+          console.error('Could not copy text: ', err);
+        }
+      );
+    }
   }
   ngOnDestroy(): void {
     if (this.entityData) {

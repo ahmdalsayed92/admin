@@ -196,4 +196,20 @@ export class ListComponent implements OnInit {
   toggleAccordion(i: number): void {
     this.openIndex = this.openIndex === i ? null : i;
   }
+
+  copyCode(code: string) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(
+        () => {
+          this.alertService.showAlert(
+            'success',
+            `Text copied to clipboard successfully`
+          );
+        },
+        (err) => {
+          console.error('Could not copy text: ', err);
+        }
+      );
+    }
+  }
 }
