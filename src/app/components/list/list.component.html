@@ -96,10 +96,10 @@
       <div class="accordion-title" [id]="'aegov-accordion-head-' + i">
         <button type="button" aria-expanded="true" (click)="toggleAccordion(i)">
           <span class="flex-1 text-2xl"
-            >{{ item.title }} <br /><span class="text-[16px] font-normal"
-              >By MOHAP</span
+            >{{ item.title }} <br /><span
+              class="text-[16px] font-normal hidden"
             ></span
-          >
+          ></span>
           <span
             class="status text-aeblack-800 relative text-[16px] font-normal"
             [class.active]="item.isActive"

@@ -69,7 +69,7 @@ export class AddEditComponent implements OnInit {
     this.form = this.fb.group({
       govEntity: [''],
       websiteName: ['', [Validators.required]],
-      baseUrl: ['', [Validators.required, validUrlValidator]],
+      baseUrl: ['', [Validators.required]],
       pages: this.fb.array([], [minItemsValidator(3)]),
       admins: this.fb.array([]),
     });
@@ -113,7 +113,7 @@ export class AddEditComponent implements OnInit {
       this.pages.push(
         this.fb.group({
           title: [item.title, Validators.required],
-          url: [item.url, [Validators.required, validUrlValidator]],
+          url: [item.url, [Validators.required]],
         })
       );
     });
@@ -135,7 +135,7 @@ export class AddEditComponent implements OnInit {
     this.pages.push(
       this.fb.group({
         title: ['', Validators.required],
-        url: ['', [Validators.required, validUrlValidator]],
+        url: ['', [Validators.required]],
       })
     );
   }
@@ -181,7 +181,7 @@ export class AddEditComponent implements OnInit {
         this.pages.push(
           this.fb.group({
             title: [page.title, Validators.required],
-            url: [page.url, [Validators.required, validUrlValidator]],
+            url: [page.url, [Validators.required]],
           })
         );
       });
