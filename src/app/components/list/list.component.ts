@@ -39,6 +39,7 @@ export class ListComponent implements OnInit {
   key: any;
   sortBy: string = 'title';
   sortOrder: string = 'asc';
+  emailString: any;
 
   constructor(
     private entityService: AdminService,
@@ -96,6 +97,11 @@ export class ListComponent implements OnInit {
           this.itemsPerPage = response.limit;
           this.totalItemsNumber = response.total;
           this.searchControl.setValue('');
+          this.emailString = this.searchResults
+            .map((i) => i.admins)
+            .map((a) => a.map((admin) => admin.adminEmail));
+
+          console.log('emailString:', this.emailString);
         },
         error: (err) =>
           this.alertService.showAlert('danger', 'Server error occurred.'),
@@ -211,5 +217,8 @@ export class ListComponent implements OnInit {
         }
       );
     }
+  }
+  getAdminsEmails(item: number): string {
+    return this.emailString[item].join(',');
   }
 }

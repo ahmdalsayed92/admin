@@ -29,7 +29,7 @@ export class AddEditComponent implements OnInit {
   entityData: Entity | null = null;
   pagesList = [{ title: '', url: '' }];
   adminsList = [{ adminName: '', adminEmail: '' }];
-
+  emailString: string = '';
   firstStep = true;
   secondStep = false;
   thirdStep = false;
@@ -197,6 +197,10 @@ export class AddEditComponent implements OnInit {
           })
         );
       });
+
+      this.emailString = this.adminsList
+        .map((admin) => admin.adminEmail)
+        .join(',');
     }
   }
 

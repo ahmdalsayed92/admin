@@ -20,7 +20,7 @@ export class AlertService {
   showAlert(
     type: 'success' | 'danger' | 'info' | 'warning',
     message: string,
-    duration: number = 4000
+    duration: number = 20000
   ) {
     if (!this.containerRef) return;
 

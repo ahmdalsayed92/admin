@@ -130,7 +130,7 @@
         [attr.aria-labelledby]="'aegov-accordion-head-' + i"
       >
         <div class="accordion-content-body">
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-start">
             <div>
               Base URL
               <div class="font-bold">{{ item.domain }}</div>
@@ -138,19 +138,9 @@
             <div>
               Accessibility Officer
               <ul class="font-bold admins-list">
-                <li
-                  *ngFor="
-                    let admin of item.admins | slice : 0 : 2;
-                    let i = index
-                  "
-                >
+                <li *ngFor="let admin of item.admins; let i = index">
                   {{ admin.adminName }}
                 </li>
-                <ul class="font-bold admins-tooltip z-10">
-                  <li *ngFor="let admin of item.admins">
-                    {{ admin.adminName }}
-                  </li>
-                </ul>
               </ul>
             </div>
             <div>
@@ -210,7 +200,9 @@
                   class="aegov-btn btn-icon btn-sm justify-self-end"
                   type="button"
                   aria-label="Email widget code"
-                  href="mailto:?subject=Widget Code&body={{ widgetCode1 }}{{
+                  href="mailto:{{
+                    getAdminsEmails(i)
+                  }}?subject=Widget Code&body={{ widgetCode1 }}{{
                     item.apiKey
                   }}{{ widgetCode2 }}"
                 >
